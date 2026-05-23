@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="台指計算機">
+<meta name="theme-color" content="#F5F1EB">
+<title>台指期計算機</title>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #F5F1EB;
+    --white: #FFFFFF;
+    --border: #E0D8CC;
+    --border2: #C8B89A;
+    --text: #1E1A14;
+    --text2: #3A3020;
+    --muted: #7A6F62;
+    --red: #C0392B;
+    --green: #1A5E35;
+    --blue: #3D5A8A;
+    --gold: #8B6914;
+  }
+
+  html, body {
+    background: var(--bg);
+    font-family: 'Georgia', 'Noto Serif TC', serif;
+    color: var(--text);
+    min-height: 100vh;
+    overscroll-behavior: none;
+  }
+
+  /* Safe area for iPhone notch */
+  .safe-top    { height: env(safe-area-inset-top); background: var(--bg); }
+  .safe-bottom { height: calc(env(safe-area-inset-bottom) + 60px); }
+
+  .header {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 50;
+    text-align: center;
+    padding: 12px 16px 10px;
+    border-bottom: 2px solid var(--text);
+  }
+  .header h1 { font-size: 18px; font-weight: 900; letter-spacing: 3px; }
+  .header p  { font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-top: 2px; }
+
+  .scroll-body { padding: 14px 14px 0; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .tab {
+    flex: 1; padding: 10px 4px;
+    border: 2px solid var(--border2);
+    background: transparent;
+    border-radius: 8px;
+    font-size: 12px; font-weight: 700;
+    color: var(--muted); cursor: pointer;
+    text-align: center; font-family: inherit;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+  }
+  .tab.active { background: var(--text); border-color: var(--text); color: var(--bg); }
+  .tab-sub { font-size: 10px; font-weight: 400; display: block; margin-top: 2px; opacity: 0.75; }
+
+  /* Direction */
+  .dir-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .dir-btn {
+    flex: 1; padding: 16px;
+    border: 2px solid var(--border2);
+    background: transparent;
+    border-radius: 10px;
+    font-size: 17px; font-weight: 900;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s; letter-spacing: 2px;
+    color: var(--muted);
+    -webkit-appearance: none;
+  }
+  .dir-btn.long.active  { background: var(--red);   border-color: var(--red);   color: white; }
+  .dir-btn.short.active { background: var(--green); border-color: var(--green); color: white; }
+
+  /* Mode */
+  .mode-row { display: flex; gap: 6px; margin-bottom: 12px; }
+  .mode-btn {
+    flex: 1; padding: 9px 4px;
+    border: 1.5px solid var(--border2);
+    background: transparent;
+    border-radius: 6px;
+    font-size: 11px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    color: var(--muted); letter-spacing: 0.5px;
+    -webkit-appearance: none;
+  }
+  .mode-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+
+  /* Card */
+  .card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .card-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; color: var(--muted);
+    margin-bottom: 10px; text-transform: uppercase;
+  }
+
+  .input-row {
+    display: flex; align-items: center;
+    gap: 8px; margin-bottom: 8px;
+  }
+  .input-row label { font-size: 13px; color: var(--text2); width: 80px; flex-shrink: 0; }
+  .input-row input {
+    flex: 1; padding: 11px 10px;
+    border: 1.5px solid var(--border2);
+    border-radius: 8px;
+    font-size: 18px; font-family: 'Georgia', monospace;
+    font-weight: 700; color: var(--text);
+    background: #FDFAF6; outline: none;
+    text-align: right;
+    -webkit-appearance: none;
+  }
+  .input-row input:focus { border-color: var(--blue); background: #F0F4FA; }
+  .input-row .unit { font-size: 12px; color: var(--muted); width: 26px; }
+
+  .quick-row { display: flex; gap: 5px; margin-top: 4px; }
+  .quick-btn {
+    flex: 1; padding: 8px 2px;
+    border: 1.5px solid var(--border2);
+    border-radius: 6px;
+    font-size: 11px; font-weight: 700;
+    cursor: pointer; background: var(--bg);
+    color: var(--text2); font-family: inherit;
+    -webkit-appearance: none;
+    transition: all 0.1s;
+  }
+  .quick-btn:active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  /* Results */
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+
+  .result-card {
+    border-radius: 10px; padding: 14px;
+    margin-bottom: 8px;
+  }
+  .result-card.loss   { background: #FDF0EE; border: 2px solid var(--red); }
+  .result-card.entry  { background: #EEF2FA; border: 2px solid var(--blue); }
+  .result-card.profit { background: #EDFAF2; border: 2px solid var(--green); }
+  .result-card.ratio  { background: #FAFAF0; border: 2px solid var(--gold); }
+
+  .result-title {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1.5px; margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .result-card.loss   .result-title { color: var(--red); }
+  .result-card.entry  .result-title { color: var(--blue); }
+  .result-card.profit .result-title { color: var(--green); }
+  .result-card.ratio  .result-title { color: var(--gold); }
+
+  .result-main { font-size: 26px; font-weight: 900; margin-bottom: 4px; }
+  .result-card.loss   .result-main { color: var(--red); }
+  .result-card.entry  .result-main { color: var(--blue); }
+  .result-card.profit .result-main { color: var(--green); }
+  .result-card.ratio  .result-main { color: var(--gold); }
+
+  .result-sub { font-size: 11.5px; color: var(--muted); line-height: 1.8; }
+
+  .ratio-badge {
+    display: inline-block; padding: 4px 12px;
+    border-radius: 20px; font-size: 12px;
+    font-weight: 700; margin-top: 6px;
+  }
+  .ratio-ok  { background: var(--green); color: white; }
+  .ratio-ok2 { background: var(--gold);  color: white; }
+  .ratio-bad { background: var(--red);   color: white; }
+
+  .fee-note {
+    background: var(--bg); border-radius: 6px;
+    padding: 10px 12px; font-size: 11px;
+    color: var(--muted); line-height: 1.8;
+    border-left: 3px solid var(--border2);
+    margin-top: 4px;
+  }
+
+  /* Bottom nav placeholder */
+  .bottom-safe { height: calc(env(safe-area-inset-bottom) + 16px); }
+</style>
+</head>
+<body>
+
+<div class="safe-top"></div>
+
+<div class="header">
+  <h1>台指期計算機</h1>
+  <p>TAIWAN FUTURES · POSITION CALCULATOR</p>
+</div>
+
+<div class="scroll-body">
+
+  <!-- Contract -->
+  <div class="tabs">
+    <button class="tab active" onclick="setContract('micro')" id="tab-micro">
+      微型台指<span class="tab-sub">每點 $10</span>
+    </button>
+    <button class="tab" onclick="setContract('mini')" id="tab-mini">
+      小台指<span class="tab-sub">每點 $50</span>
+    </button>
+    <button class="tab" onclick="setContract('big')" id="tab-big">
+      大台指<span class="tab-sub">每點 $200</span>
+    </button>
+  </div>
+
+  <!-- Direction -->
+  <div class="dir-row">
+    <button class="dir-btn long active" onclick="setDir('long')" id="btn-long">做多 ▲</button>
+    <button class="dir-btn short" onclick="setDir('short')" id="btn-short">做空 ▼</button>
+  </div>
+
+  <!-- Mode -->
+  <div class="mode-row">
+    <button class="mode-btn active" onclick="setMode('sl-first')" id="mode-sl">先設停損點位</button>
+    <button class="mode-btn" onclick="setMode('pts-first')" id="mode-pts">先設虧損點數</button>
+  </div>
+
+  <!-- Inputs -->
+  <div class="card">
+    <div class="card-label">基本設定</div>
+
+    <div class="input-row">
+      <label>口數</label>
+      <input type="number" id="lots" value="1" min="1" max="20" inputmode="numeric" oninput="calc()">
+      <span class="unit">口</span>
+    </div>
+
+    <!-- Mode A: 先設停損點位 -->
+    <div id="panel-sl">
+      <div class="input-row">
+        <label>停損點位</label>
+        <input type="number" id="sl-price" value="40000" inputmode="numeric" oninput="calc()">
+        <span class="unit">點</span>
+      </div>
+      <div class="input-row">
+        <label>進場緩衝</label>
+        <input type="number" id="buffer" value="50" inputmode="numeric" oninput="calc()">
+        <span class="unit">點</span>
+      </div>
+      <div class="quick-row">
+        <button class="quick-btn" onclick="setVal('buffer',20)">20</button>
+        <button class="quick-btn" onclick="setVal('buffer',30)">30</button>
+        <button class="quick-btn" onclick="setVal('buffer',50)">50</button>
+        <button class="quick-btn" onclick="setVal('buffer',80)">80</button>
+        <button class="quick-btn" onclick="setVal('buffer',100)">100</button>
+      </div>
+    </div>
+
+    <!-- Mode B: 先設虧損點數 -->
+    <div id="panel-pts" style="display:none">
+      <div class="input-row">
+        <label>進場點位</label>
+        <input type="number" id="entry-price" value="40200" inputmode="numeric" oninput="calc()">
+        <span class="unit">點</span>
+      </div>
+      <div class="input-row">
+        <label>最多虧損</label>
+        <input type="number" id="loss-pts" value="50" inputmode="numeric" oninput="calc()">
+        <span class="unit">點</span>
+      </div>
+      <div class="quick-row">
+        <button class="quick-btn" onclick="setVal('loss-pts',30)">30</button>
+        <button class="quick-btn" onclick="setVal('loss-pts',50)">50</button>
+        <button class="quick-btn" onclick="setVal('loss-pts',80)">80</button>
+        <button class="quick-btn" onclick="setVal('loss-pts',100)">100</button>
+        <button class="quick-btn" onclick="setVal('loss-pts',150)">150</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ratio -->
+  <div class="card">
+    <div class="card-label">賺賠比</div>
+    <div class="input-row">
+      <label>目標比率</label>
+      <input type="number" id="ratio" value="2" min="0.5" max="10" step="0.5" inputmode="decimal" oninput="calc()">
+      <span class="unit">: 1</span>
+    </div>
+    <div class="quick-row">
+      <button class="quick-btn" onclick="setVal('ratio',1.5)">1.5:1</button>
+      <button class="quick-btn" onclick="setVal('ratio',2)">2:1</button>
+      <button class="quick-btn" onclick="setVal('ratio',2.5)">2.5:1</button>
+      <button class="quick-btn" onclick="setVal('ratio',3)">3:1</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results"></div>
+
+  <div class="bottom-safe"></div>
+</div>
+
+<script>
+let contract = 'micro';
+let direction = 'long';
+let mode = 'sl-first';
+
+const PV   = { micro:10,  mini:50,  big:200 };
+const FEE  = { micro:13,  mini:17,  big:35  };
+const NAME = { micro:'微台', mini:'小台', big:'大台' };
+
+function setContract(c) {
+  contract = c;
+  ['micro','mini','big'].forEach(x =>
+    document.getElementById('tab-'+x).classList.toggle('active', x===c));
+  calc();
+}
+function setDir(d) {
+  direction = d;
+  document.getElementById('btn-long').classList.toggle('active', d==='long');
+  document.getElementById('btn-short').classList.toggle('active', d==='short');
+  calc();
+}
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-sl').classList.toggle('active', m==='sl-first');
+  document.getElementById('mode-pts').classList.toggle('active', m==='pts-first');
+  document.getElementById('panel-sl').style.display  = m==='sl-first'  ? '' : 'none';
+  document.getElementById('panel-pts').style.display = m==='pts-first' ? '' : 'none';
+  calc();
+}
+function setVal(id, v) { document.getElementById(id).value = v; calc(); }
+function fmt(n) { return Math.abs(n).toLocaleString('zh-TW'); }
+
+function calc() {
+  const lots  = parseInt(document.getElementById('lots').value)  || 1;
+  const ratio = parseFloat(document.getElementById('ratio').value) || 2;
+  const pv    = PV[contract];
+  const fee   = FEE[contract];
+
+  let entry, sl, lossPts;
+
+  if (mode === 'sl-first') {
+    sl      = parseFloat(document.getElementById('sl-price').value) || 40000;
+    const buf = parseFloat(document.getElementById('buffer').value) || 50;
+    entry   = direction === 'long' ? sl + buf : sl - buf;
+    lossPts = buf;
+  } else {
+    entry   = parseFloat(document.getElementById('entry-price').value) || 40200;
+    lossPts = parseFloat(document.getElementById('loss-pts').value) || 50;
+    sl      = direction === 'long' ? entry - lossPts : entry + lossPts;
+  }
+
+  const lossAmt  = lossPts * pv * lots;
+  const feeTotal = fee * 2 * lots;
+  const lossNet  = lossAmt + feeTotal;
+
+  const profitPts = lossPts * ratio;
+  const tp        = direction === 'long' ? entry + profitPts : entry - profitPts;
+  const profitAmt = profitPts * pv * lots - feeTotal;
+  const realRatio = (profitAmt / lossNet).toFixed(2);
+
+  let badge, badgeClass;
+  if (ratio >= 2.5)      { badge = '✅ 優質賺賠比'; badgeClass = 'ratio-ok'; }
+  else if (ratio >= 2.0) { badge = '⚡ 可接受';    badgeClass = 'ratio-ok2'; }
+  else                   { badge = '⚠️ 偏低慎入';  badgeClass = 'ratio-bad'; }
+
+  const dirLabel = direction === 'long' ? '多單 ▲' : '空單 ▼';
+
+  document.getElementById('results').innerHTML = `
+    <div class="result-grid">
+      <div class="result-card entry" style="margin-bottom:0">
+        <div class="result-title">最差進場點</div>
+        <div class="result-main">${fmt(entry)}</div>
+        <div class="result-sub">${dirLabel}<br>${NAME[contract]} ${lots}口</div>
+      </div>
+      <div class="result-card loss" style="margin-bottom:0">
+        <div class="result-title">停損位置</div>
+        <div class="result-main">${fmt(sl)}</div>
+        <div class="result-sub">距離 ${lossPts} 點</div>
+      </div>
+    </div>
+
+    <div class="result-card loss">
+      <div class="result-title">最大虧損（含手續費）</div>
+      <div class="result-main">−${fmt(lossNet)} 元</div>
+      <div class="result-sub">
+        ${lossPts}點 × $${pv} × ${lots}口 = $${fmt(lossAmt)}<br>
+        手續費來回 = $${fmt(feeTotal)}<br>
+        <strong>合計 $${fmt(lossNet)}</strong>
+      </div>
+    </div>
+
+    <div class="result-card profit">
+      <div class="result-title">停利位置（${ratio}:1）</div>
+      <div class="result-main">${fmt(tp)}</div>
+      <div class="result-sub">
+        目標 ${profitPts} 點<br>
+        扣費後獲利 <strong>$${fmt(profitAmt)}</strong>
+      </div>
+    </div>
+
+    <div class="result-card ratio">
+      <div class="result-title">賺賠比評估</div>
+      <div class="result-main">${ratio} : 1</div>
+      <div class="result-sub">實際比（扣費後）= ${realRatio} : 1</div>
+      <span class="ratio-badge ${badgeClass}">${badge}</span>
+    </div>
+
+    <div class="fee-note">
+      手續費：微台 $13／小台 $17／大台 $35（單向）· 以上均含來回計算
+    </div>
+  `;
+}
+
+calc();
+
+// PWA Service Worker
+if ('serviceWorker' in navigator) {
+  const sw = `
+    const CACHE = 'futures-calc-v1';
+    self.addEventListener('install', e => e.waitUntil(
+      caches.open(CACHE).then(c => c.addAll(['/']))
+    ));
+    self.addEventListener('fetch', e => e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request))
+    ));
+  `;
+  const blob = new Blob([sw], {type:'application/javascript'});
+  const url  = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).catch(()=>{});
+}
+</script>
+</body>
+</html>
