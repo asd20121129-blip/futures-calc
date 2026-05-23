@@ -6,215 +6,199 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="台指計算機">
-<meta name="theme-color" content="#F5F1EB">
+<meta name="theme-color" content="#F7F5F2">
 <title>台指期計算機</title>
-
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  :root {
-    --bg: #F5F1EB;
-    --white: #FFFFFF;
-    --border: #E0D8CC;
-    --border2: #C8B89A;
-    --text: #1E1A14;
-    --text2: #3A3020;
-    --muted: #7A6F62;
-    --red: #C0392B;
-    --green: #1A5E35;
-    --blue: #3D5A8A;
-    --gold: #8B6914;
-  }
+body {
+  background: #F7F5F2;
+  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  color: #1A1A1A;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 0 40px;
+}
 
-  html, body {
-    background: var(--bg);
-    font-family: 'Georgia', 'Noto Serif TC', serif;
-    color: var(--text);
-    min-height: 100vh;
-    overscroll-behavior: none;
-  }
+.header {
+  padding: 20px 16px 14px;
+  border-bottom: 1px solid #E0DDD8;
+}
+.header h1 { font-size: 17px; font-weight: 700; letter-spacing: 1px; }
+.header p  { font-size: 11px; color: #999; margin-top: 2px; letter-spacing: 1px; }
 
-  /* Safe area for iPhone notch */
-  .safe-top    { height: env(safe-area-inset-top); background: var(--bg); }
-  .safe-bottom { height: calc(env(safe-area-inset-bottom) + 60px); }
+.body { padding: 16px; }
 
-  .header {
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 50;
-    text-align: center;
-    padding: 12px 16px 10px;
-    border-bottom: 2px solid var(--text);
-  }
-  .header h1 { font-size: 18px; font-weight: 900; letter-spacing: 3px; }
-  .header p  { font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-top: 2px; }
+/* Segment controls */
+.seg {
+  display: flex;
+  background: #ECEAE6;
+  border-radius: 8px;
+  padding: 3px;
+  margin-bottom: 12px;
+}
+.seg-btn {
+  flex: 1; padding: 7px 4px;
+  border: none; background: transparent;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+  color: #888; cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  line-height: 1.3;
+}
+.seg-btn small { font-size: 10px; font-weight: 400; display: block; color: #AAA; }
+.seg-btn.active { background: white; color: #1A1A1A; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.seg-btn.active small { color: #666; }
 
-  .scroll-body { padding: 14px 14px 0; }
+/* Direction */
+.dir-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.dir-btn {
+  flex: 1; padding: 10px;
+  border: 1.5px solid #D8D4CE;
+  background: white; border-radius: 8px;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  color: #888; transition: all 0.15s;
+  -webkit-appearance: none;
+}
+.dir-btn.long.active  { background: #1A1A1A; border-color: #1A1A1A; color: white; }
+.dir-btn.short.active { background: #1A1A1A; border-color: #1A1A1A; color: white; }
 
-  /* Tabs */
-  .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
-  .tab {
-    flex: 1; padding: 10px 4px;
-    border: 2px solid var(--border2);
-    background: transparent;
-    border-radius: 8px;
-    font-size: 12px; font-weight: 700;
-    color: var(--muted); cursor: pointer;
-    text-align: center; font-family: inherit;
-    transition: all 0.15s;
-    -webkit-appearance: none;
-  }
-  .tab.active { background: var(--text); border-color: var(--text); color: var(--bg); }
-  .tab-sub { font-size: 10px; font-weight: 400; display: block; margin-top: 2px; opacity: 0.75; }
+/* Mode seg */
+.mode-seg {
+  display: flex; background: #ECEAE6;
+  border-radius: 8px; padding: 3px;
+  margin-bottom: 14px;
+}
+.mode-btn {
+  flex: 1; padding: 7px 6px;
+  border: none; background: transparent;
+  border-radius: 6px; font-size: 12px;
+  font-weight: 600; color: #888;
+  cursor: pointer; font-family: inherit;
+}
+.mode-btn.active { background: white; color: #1A1A1A; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
 
-  /* Direction */
-  .dir-row { display: flex; gap: 8px; margin-bottom: 12px; }
-  .dir-btn {
-    flex: 1; padding: 16px;
-    border: 2px solid var(--border2);
-    background: transparent;
-    border-radius: 10px;
-    font-size: 17px; font-weight: 900;
-    cursor: pointer; font-family: inherit;
-    transition: all 0.15s; letter-spacing: 2px;
-    color: var(--muted);
-    -webkit-appearance: none;
-  }
-  .dir-btn.long.active  { background: var(--red);   border-color: var(--red);   color: white; }
-  .dir-btn.short.active { background: var(--green); border-color: var(--green); color: white; }
+/* Input rows */
+.section-label {
+  font-size: 11px; font-weight: 600;
+  color: #999; letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
 
-  /* Mode */
-  .mode-row { display: flex; gap: 6px; margin-bottom: 12px; }
-  .mode-btn {
-    flex: 1; padding: 9px 4px;
-    border: 1.5px solid var(--border2);
-    background: transparent;
-    border-radius: 6px;
-    font-size: 11px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    color: var(--muted); letter-spacing: 0.5px;
-    -webkit-appearance: none;
-  }
-  .mode-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+.row {
+  display: flex; align-items: center;
+  gap: 10px; margin-bottom: 10px;
+}
+.row label { font-size: 13px; color: #555; width: 72px; flex-shrink: 0; }
+.row input {
+  flex: 1; padding: 9px 12px;
+  border: 1px solid #D8D4CE;
+  border-radius: 8px; font-size: 17px;
+  font-weight: 700; color: #1A1A1A;
+  background: white; outline: none;
+  text-align: right; font-family: inherit;
+  -webkit-appearance: none;
+}
+.row input:focus { border-color: #1A1A1A; }
+.row .unit { font-size: 12px; color: #AAA; width: 22px; }
 
-  /* Card */
-  .card {
-    background: var(--white);
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 10px;
-    border: 1px solid var(--border);
-  }
-  .card-label {
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 2px; color: var(--muted);
-    margin-bottom: 10px; text-transform: uppercase;
-  }
+.quick { display: flex; gap: 5px; margin: -4px 0 12px 82px; }
+.qbtn {
+  flex: 1; padding: 6px 2px;
+  border: 1px solid #D8D4CE;
+  border-radius: 6px; font-size: 11px;
+  font-weight: 600; cursor: pointer;
+  background: white; color: #555;
+  font-family: inherit; transition: all 0.1s;
+}
+.qbtn:active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
 
-  .input-row {
-    display: flex; align-items: center;
-    gap: 8px; margin-bottom: 8px;
-  }
-  .input-row label { font-size: 13px; color: var(--text2); width: 80px; flex-shrink: 0; }
-  .input-row input {
-    flex: 1; padding: 11px 10px;
-    border: 1.5px solid var(--border2);
-    border-radius: 8px;
-    font-size: 18px; font-family: 'Georgia', monospace;
-    font-weight: 700; color: var(--text);
-    background: #FDFAF6; outline: none;
-    text-align: right;
-    -webkit-appearance: none;
-  }
-  .input-row input:focus { border-color: var(--blue); background: #F0F4FA; }
-  .input-row .unit { font-size: 12px; color: var(--muted); width: 26px; }
+.divider { height: 1px; background: #E8E5E0; margin: 16px 0; }
 
-  .quick-row { display: flex; gap: 5px; margin-top: 4px; }
-  .quick-btn {
-    flex: 1; padding: 8px 2px;
-    border: 1.5px solid var(--border2);
-    border-radius: 6px;
-    font-size: 11px; font-weight: 700;
-    cursor: pointer; background: var(--bg);
-    color: var(--text2); font-family: inherit;
-    -webkit-appearance: none;
-    transition: all 0.1s;
-  }
-  .quick-btn:active { background: var(--text); color: var(--bg); border-color: var(--text); }
+/* Results — clean, no color blocks */
+.result-section { margin-bottom: 4px; }
 
-  /* Results */
-  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.result-row {
+  display: flex; justify-content: space-between;
+  align-items: baseline; padding: 10px 0;
+  border-bottom: 1px solid #EDEBE7;
+}
+.result-row:last-child { border-bottom: none; }
 
-  .result-card {
-    border-radius: 10px; padding: 14px;
-    margin-bottom: 8px;
-  }
-  .result-card.loss   { background: #FDF0EE; border: 2px solid var(--red); }
-  .result-card.entry  { background: #EEF2FA; border: 2px solid var(--blue); }
-  .result-card.profit { background: #EDFAF2; border: 2px solid var(--green); }
-  .result-card.ratio  { background: #FAFAF0; border: 2px solid var(--gold); }
+.rl { font-size: 12px; color: #888; }
+.rv {
+  font-size: 20px; font-weight: 800;
+  letter-spacing: -0.5px; color: #1A1A1A;
+}
+.rv.red   { color: #B83232; }
+.rv.green { color: #1E6B3A; }
+.rv.blue  { color: #2D5A9E; }
 
-  .result-title {
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; margin-bottom: 6px;
-    text-transform: uppercase;
-  }
-  .result-card.loss   .result-title { color: var(--red); }
-  .result-card.entry  .result-title { color: var(--blue); }
-  .result-card.profit .result-title { color: var(--green); }
-  .result-card.ratio  .result-title { color: var(--gold); }
+.result-detail {
+  font-size: 11px; color: #AAA;
+  text-align: right; margin-top: 2px;
+  line-height: 1.6;
+}
 
-  .result-main { font-size: 26px; font-weight: 900; margin-bottom: 4px; }
-  .result-card.loss   .result-main { color: var(--red); }
-  .result-card.entry  .result-main { color: var(--blue); }
-  .result-card.profit .result-main { color: var(--green); }
-  .result-card.ratio  .result-main { color: var(--gold); }
+/* Big result cards — minimal */
+.big-card {
+  background: white; border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 8px;
+  border: 1px solid #E8E5E0;
+}
+.big-card .bc-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; color: #AAA;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.big-card .bc-val {
+  font-size: 30px; font-weight: 800;
+  letter-spacing: -1px;
+}
+.big-card .bc-sub { font-size: 12px; color: #AAA; margin-top: 4px; line-height: 1.7; }
 
-  .result-sub { font-size: 11.5px; color: var(--muted); line-height: 1.8; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 
-  .ratio-badge {
-    display: inline-block; padding: 4px 12px;
-    border-radius: 20px; font-size: 12px;
-    font-weight: 700; margin-top: 6px;
-  }
-  .ratio-ok  { background: var(--green); color: white; }
-  .ratio-ok2 { background: var(--gold);  color: white; }
-  .ratio-bad { background: var(--red);   color: white; }
+.badge {
+  display: inline-block; padding: 3px 10px;
+  border-radius: 20px; font-size: 11px;
+  font-weight: 700; margin-top: 8px;
+}
+.badge.ok  { background: #E8F5EC; color: #1E6B3A; border: 1px solid #B8DEC3; }
+.badge.ok2 { background: #FFF8E6; color: #8B6914; border: 1px solid #DECA8A; }
+.badge.bad { background: #FDEEEE; color: #B83232; border: 1px solid #EEC0C0; }
 
-  .fee-note {
-    background: var(--bg); border-radius: 6px;
-    padding: 10px 12px; font-size: 11px;
-    color: var(--muted); line-height: 1.8;
-    border-left: 3px solid var(--border2);
-    margin-top: 4px;
-  }
-
-  /* Bottom nav placeholder */
-  .bottom-safe { height: calc(env(safe-area-inset-bottom) + 16px); }
+.fee-note {
+  font-size: 11px; color: #BBB;
+  padding: 10px 0; line-height: 1.7;
+  border-top: 1px solid #E8E5E0;
+  margin-top: 4px;
+}
 </style>
 </head>
 <body>
-
-<div class="safe-top"></div>
 
 <div class="header">
   <h1>台指期計算機</h1>
   <p>TAIWAN FUTURES · POSITION CALCULATOR</p>
 </div>
 
-<div class="scroll-body">
+<div class="body">
 
   <!-- Contract -->
-  <div class="tabs">
-    <button class="tab active" onclick="setContract('micro')" id="tab-micro">
-      微型台指<span class="tab-sub">每點 $10</span>
+  <div class="seg">
+    <button class="seg-btn active" onclick="setContract('micro')" id="tab-micro">
+      微型台指<small>每點 $10</small>
     </button>
-    <button class="tab" onclick="setContract('mini')" id="tab-mini">
-      小台指<span class="tab-sub">每點 $50</span>
+    <button class="seg-btn" onclick="setContract('mini')" id="tab-mini">
+      小台指<small>每點 $50</small>
     </button>
-    <button class="tab" onclick="setContract('big')" id="tab-big">
-      大台指<span class="tab-sub">每點 $200</span>
+    <button class="seg-btn" onclick="setContract('big')" id="tab-big">
+      大台指<small>每點 $200</small>
     </button>
   </div>
 
@@ -225,215 +209,189 @@
   </div>
 
   <!-- Mode -->
-  <div class="mode-row">
-    <button class="mode-btn active" onclick="setMode('sl-first')" id="mode-sl">先設停損點位</button>
-    <button class="mode-btn" onclick="setMode('pts-first')" id="mode-pts">先設虧損點數</button>
+  <div class="mode-seg">
+    <button class="mode-btn active" onclick="setMode('sl')" id="mode-sl">先設停損點位</button>
+    <button class="mode-btn" onclick="setMode('pts')" id="mode-pts">先設虧損點數</button>
   </div>
 
   <!-- Inputs -->
-  <div class="card">
-    <div class="card-label">基本設定</div>
+  <div class="section-label">設定</div>
 
-    <div class="input-row">
-      <label>口數</label>
-      <input type="number" id="lots" value="1" min="1" max="20" inputmode="numeric" oninput="calc()">
-      <span class="unit">口</span>
+  <div class="row">
+    <label>口數</label>
+    <input type="number" id="lots" value="1" min="1" max="20" inputmode="numeric" oninput="calc()">
+    <span class="unit">口</span>
+  </div>
+
+  <div id="panel-sl">
+    <div class="row">
+      <label>停損點位</label>
+      <input type="number" id="sl-price" value="40000" inputmode="numeric" oninput="calc()">
+      <span class="unit">點</span>
     </div>
-
-    <!-- Mode A: 先設停損點位 -->
-    <div id="panel-sl">
-      <div class="input-row">
-        <label>停損點位</label>
-        <input type="number" id="sl-price" value="40000" inputmode="numeric" oninput="calc()">
-        <span class="unit">點</span>
-      </div>
-      <div class="input-row">
-        <label>進場緩衝</label>
-        <input type="number" id="buffer" value="50" inputmode="numeric" oninput="calc()">
-        <span class="unit">點</span>
-      </div>
-      <div class="quick-row">
-        <button class="quick-btn" onclick="setVal('buffer',20)">20</button>
-        <button class="quick-btn" onclick="setVal('buffer',30)">30</button>
-        <button class="quick-btn" onclick="setVal('buffer',50)">50</button>
-        <button class="quick-btn" onclick="setVal('buffer',80)">80</button>
-        <button class="quick-btn" onclick="setVal('buffer',100)">100</button>
-      </div>
+    <div class="row">
+      <label>進場緩衝</label>
+      <input type="number" id="buffer" value="50" inputmode="numeric" oninput="calc()">
+      <span class="unit">點</span>
     </div>
-
-    <!-- Mode B: 先設虧損點數 -->
-    <div id="panel-pts" style="display:none">
-      <div class="input-row">
-        <label>進場點位</label>
-        <input type="number" id="entry-price" value="40200" inputmode="numeric" oninput="calc()">
-        <span class="unit">點</span>
-      </div>
-      <div class="input-row">
-        <label>最多虧損</label>
-        <input type="number" id="loss-pts" value="50" inputmode="numeric" oninput="calc()">
-        <span class="unit">點</span>
-      </div>
-      <div class="quick-row">
-        <button class="quick-btn" onclick="setVal('loss-pts',30)">30</button>
-        <button class="quick-btn" onclick="setVal('loss-pts',50)">50</button>
-        <button class="quick-btn" onclick="setVal('loss-pts',80)">80</button>
-        <button class="quick-btn" onclick="setVal('loss-pts',100)">100</button>
-        <button class="quick-btn" onclick="setVal('loss-pts',150)">150</button>
-      </div>
+    <div class="quick">
+      <button class="qbtn" onclick="sv('buffer',20)">20</button>
+      <button class="qbtn" onclick="sv('buffer',30)">30</button>
+      <button class="qbtn" onclick="sv('buffer',50)">50</button>
+      <button class="qbtn" onclick="sv('buffer',80)">80</button>
+      <button class="qbtn" onclick="sv('buffer',100)">100</button>
     </div>
   </div>
 
-  <!-- Ratio -->
-  <div class="card">
-    <div class="card-label">賺賠比</div>
-    <div class="input-row">
-      <label>目標比率</label>
-      <input type="number" id="ratio" value="2" min="0.5" max="10" step="0.5" inputmode="decimal" oninput="calc()">
-      <span class="unit">: 1</span>
+  <div id="panel-pts" style="display:none">
+    <div class="row">
+      <label>進場點位</label>
+      <input type="number" id="entry-px" value="40200" inputmode="numeric" oninput="calc()">
+      <span class="unit">點</span>
     </div>
-    <div class="quick-row">
-      <button class="quick-btn" onclick="setVal('ratio',1.5)">1.5:1</button>
-      <button class="quick-btn" onclick="setVal('ratio',2)">2:1</button>
-      <button class="quick-btn" onclick="setVal('ratio',2.5)">2.5:1</button>
-      <button class="quick-btn" onclick="setVal('ratio',3)">3:1</button>
+    <div class="row">
+      <label>最多虧損</label>
+      <input type="number" id="loss-pts" value="50" inputmode="numeric" oninput="calc()">
+      <span class="unit">點</span>
+    </div>
+    <div class="quick">
+      <button class="qbtn" onclick="sv('loss-pts',30)">30</button>
+      <button class="qbtn" onclick="sv('loss-pts',50)">50</button>
+      <button class="qbtn" onclick="sv('loss-pts',80)">80</button>
+      <button class="qbtn" onclick="sv('loss-pts',100)">100</button>
+      <button class="qbtn" onclick="sv('loss-pts',150)">150</button>
     </div>
   </div>
+
+  <div class="row">
+    <label>賺賠比</label>
+    <input type="number" id="ratio" value="2" min="0.5" step="0.5" inputmode="decimal" oninput="calc()">
+    <span class="unit">: 1</span>
+  </div>
+  <div class="quick">
+    <button class="qbtn" onclick="sv('ratio',1.5)">1.5</button>
+    <button class="qbtn" onclick="sv('ratio',2)">2</button>
+    <button class="qbtn" onclick="sv('ratio',2.5)">2.5</button>
+    <button class="qbtn" onclick="sv('ratio',3)">3</button>
+  </div>
+
+  <div class="divider"></div>
 
   <!-- Results -->
   <div id="results"></div>
 
-  <div class="bottom-safe"></div>
 </div>
 
 <script>
-let contract = 'micro';
-let direction = 'long';
-let mode = 'sl-first';
+let contract='micro', direction='long', mode='sl';
+const PV={micro:10,mini:50,big:200};
+const FEE={micro:13,mini:17,big:35};
+const NM={micro:'微台',mini:'小台',big:'大台'};
 
-const PV   = { micro:10,  mini:50,  big:200 };
-const FEE  = { micro:13,  mini:17,  big:35  };
-const NAME = { micro:'微台', mini:'小台', big:'大台' };
-
-function setContract(c) {
-  contract = c;
-  ['micro','mini','big'].forEach(x =>
-    document.getElementById('tab-'+x).classList.toggle('active', x===c));
+function setContract(c){
+  contract=c;
+  ['micro','mini','big'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===c));
   calc();
 }
-function setDir(d) {
-  direction = d;
-  document.getElementById('btn-long').classList.toggle('active', d==='long');
-  document.getElementById('btn-short').classList.toggle('active', d==='short');
+function setDir(d){
+  direction=d;
+  document.getElementById('btn-long').classList.toggle('active',d==='long');
+  document.getElementById('btn-short').classList.toggle('active',d==='short');
   calc();
 }
-function setMode(m) {
-  mode = m;
-  document.getElementById('mode-sl').classList.toggle('active', m==='sl-first');
-  document.getElementById('mode-pts').classList.toggle('active', m==='pts-first');
-  document.getElementById('panel-sl').style.display  = m==='sl-first'  ? '' : 'none';
-  document.getElementById('panel-pts').style.display = m==='pts-first' ? '' : 'none';
+function setMode(m){
+  mode=m;
+  document.getElementById('mode-sl').classList.toggle('active',m==='sl');
+  document.getElementById('mode-pts').classList.toggle('active',m==='pts');
+  document.getElementById('panel-sl').style.display=m==='sl'?'':'none';
+  document.getElementById('panel-pts').style.display=m==='pts'?'':'none';
   calc();
 }
-function setVal(id, v) { document.getElementById(id).value = v; calc(); }
-function fmt(n) { return Math.abs(n).toLocaleString('zh-TW'); }
+function sv(id,v){document.getElementById(id).value=v;calc();}
+function f(n){return Math.round(n).toLocaleString('zh-TW');}
 
-function calc() {
-  const lots  = parseInt(document.getElementById('lots').value)  || 1;
-  const ratio = parseFloat(document.getElementById('ratio').value) || 2;
-  const pv    = PV[contract];
-  const fee   = FEE[contract];
-
+function calc(){
+  const lots=parseInt(document.getElementById('lots').value)||1;
+  const ratio=parseFloat(document.getElementById('ratio').value)||2;
+  const pv=PV[contract], fee=FEE[contract];
   let entry, sl, lossPts;
 
-  if (mode === 'sl-first') {
-    sl      = parseFloat(document.getElementById('sl-price').value) || 40000;
-    const buf = parseFloat(document.getElementById('buffer').value) || 50;
-    entry   = direction === 'long' ? sl + buf : sl - buf;
-    lossPts = buf;
+  if(mode==='sl'){
+    sl=parseFloat(document.getElementById('sl-price').value)||40000;
+    const buf=parseFloat(document.getElementById('buffer').value)||50;
+    entry=direction==='long'?sl+buf:sl-buf;
+    lossPts=buf;
   } else {
-    entry   = parseFloat(document.getElementById('entry-price').value) || 40200;
-    lossPts = parseFloat(document.getElementById('loss-pts').value) || 50;
-    sl      = direction === 'long' ? entry - lossPts : entry + lossPts;
+    entry=parseFloat(document.getElementById('entry-px').value)||40200;
+    lossPts=parseFloat(document.getElementById('loss-pts').value)||50;
+    sl=direction==='long'?entry-lossPts:entry+lossPts;
   }
 
-  const lossAmt  = lossPts * pv * lots;
-  const feeTotal = fee * 2 * lots;
-  const lossNet  = lossAmt + feeTotal;
+  const lossAmt=lossPts*pv*lots;
+  const feeTotal=fee*2*lots;
+  const lossNet=lossAmt+feeTotal;
+  const profitPts=lossPts*ratio;
+  const tp=direction==='long'?entry+profitPts:entry-profitPts;
+  const profitNet=profitPts*pv*lots-feeTotal;
+  const realR=(profitNet/lossNet).toFixed(2);
 
-  const profitPts = lossPts * ratio;
-  const tp        = direction === 'long' ? entry + profitPts : entry - profitPts;
-  const profitAmt = profitPts * pv * lots - feeTotal;
-  const realRatio = (profitAmt / lossNet).toFixed(2);
+  let badge,bc;
+  if(ratio>=2.5){badge='✓ 優質賺賠比';bc='ok';}
+  else if(ratio>=2){badge='可接受';bc='ok2';}
+  else{badge='偏低，謹慎入場';bc='bad';}
 
-  let badge, badgeClass;
-  if (ratio >= 2.5)      { badge = '✅ 優質賺賠比'; badgeClass = 'ratio-ok'; }
-  else if (ratio >= 2.0) { badge = '⚡ 可接受';    badgeClass = 'ratio-ok2'; }
-  else                   { badge = '⚠️ 偏低慎入';  badgeClass = 'ratio-bad'; }
+  const dLabel=direction==='long'?'多單':'空單';
 
-  const dirLabel = direction === 'long' ? '多單 ▲' : '空單 ▼';
-
-  document.getElementById('results').innerHTML = `
-    <div class="result-grid">
-      <div class="result-card entry" style="margin-bottom:0">
-        <div class="result-title">最差進場點</div>
-        <div class="result-main">${fmt(entry)}</div>
-        <div class="result-sub">${dirLabel}<br>${NAME[contract]} ${lots}口</div>
+  document.getElementById('results').innerHTML=`
+    <div class="two-col">
+      <div class="big-card">
+        <div class="bc-label">最差進場點</div>
+        <div class="bc-val blue">${f(entry)}</div>
+        <div class="bc-sub">${dLabel} · ${NM[contract]} ${lots}口</div>
       </div>
-      <div class="result-card loss" style="margin-bottom:0">
-        <div class="result-title">停損位置</div>
-        <div class="result-main">${fmt(sl)}</div>
-        <div class="result-sub">距離 ${lossPts} 點</div>
-      </div>
-    </div>
-
-    <div class="result-card loss">
-      <div class="result-title">最大虧損（含手續費）</div>
-      <div class="result-main">−${fmt(lossNet)} 元</div>
-      <div class="result-sub">
-        ${lossPts}點 × $${pv} × ${lots}口 = $${fmt(lossAmt)}<br>
-        手續費來回 = $${fmt(feeTotal)}<br>
-        <strong>合計 $${fmt(lossNet)}</strong>
+      <div class="big-card">
+        <div class="bc-label">停損位置</div>
+        <div class="bc-val red">${f(sl)}</div>
+        <div class="bc-sub">距離 ${lossPts} 點</div>
       </div>
     </div>
 
-    <div class="result-card profit">
-      <div class="result-title">停利位置（${ratio}:1）</div>
-      <div class="result-main">${fmt(tp)}</div>
-      <div class="result-sub">
-        目標 ${profitPts} 點<br>
-        扣費後獲利 <strong>$${fmt(profitAmt)}</strong>
+    <div class="big-card">
+      <div class="bc-label">最大虧損（含手續費）</div>
+      <div class="bc-val red">－${f(lossNet)} 元</div>
+      <div class="bc-sub">
+        ${lossPts}點 × $${pv} × ${lots}口 = $${f(lossAmt)}<br>
+        手續費來回 $${f(feeTotal)} · 合計 $${f(lossNet)}
       </div>
     </div>
 
-    <div class="result-card ratio">
-      <div class="result-title">賺賠比評估</div>
-      <div class="result-main">${ratio} : 1</div>
-      <div class="result-sub">實際比（扣費後）= ${realRatio} : 1</div>
-      <span class="ratio-badge ${badgeClass}">${badge}</span>
+    <div class="big-card">
+      <div class="bc-label">停利位置（${ratio}:1）</div>
+      <div class="bc-val green">${f(tp)}</div>
+      <div class="bc-sub">
+        目標 ${profitPts} 點 · 扣費後獲利 $${f(profitNet)}
+      </div>
+    </div>
+
+    <div class="big-card">
+      <div class="bc-label">賺賠比評估</div>
+      <div class="bc-val">${ratio} : 1</div>
+      <div class="bc-sub">實際比（扣費後）= ${realR} : 1</div>
+      <span class="badge ${bc}">${badge}</span>
     </div>
 
     <div class="fee-note">
-      手續費：微台 $13／小台 $17／大台 $35（單向）· 以上均含來回計算
+      手續費：微台 $13 · 小台 $17 · 大台 $35（單向，含來回計算）
     </div>
   `;
 }
 
 calc();
 
-// PWA Service Worker
-if ('serviceWorker' in navigator) {
-  const sw = `
-    const CACHE = 'futures-calc-v1';
-    self.addEventListener('install', e => e.waitUntil(
-      caches.open(CACHE).then(c => c.addAll(['/']))
-    ));
-    self.addEventListener('fetch', e => e.respondWith(
-      caches.match(e.request).then(r => r || fetch(e.request))
-    ));
-  `;
-  const blob = new Blob([sw], {type:'application/javascript'});
-  const url  = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(url).catch(()=>{});
+if('serviceWorker' in navigator){
+  const sw=`const C='fc-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['/']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
+  const blob=new Blob([sw],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
 }
 </script>
 </body>
