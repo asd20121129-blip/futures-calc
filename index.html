@@ -8,232 +8,115 @@
 <meta name="apple-mobile-web-app-title" content="台指計算機">
 <meta name="theme-color" content="#F7F5F2">
 <title>台指期計算機</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-body {
-  background: #F7F5F2;
-  font-family: -apple-system, 'Helvetica Neue', sans-serif;
-  color: #1A1A1A;
-  min-height: 100vh;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0 0 40px;
-}
-
-.header {
-  padding: 20px 16px 14px;
-  border-bottom: 1px solid #E0DDD8;
-}
-.header h1 { font-size: 17px; font-weight: 700; letter-spacing: 1px; }
-.header p  { font-size: 11px; color: #999; margin-top: 2px; letter-spacing: 1px; }
-
-.body { padding: 16px; }
-
-/* Segment controls */
-.seg {
-  display: flex;
-  background: #ECEAE6;
-  border-radius: 8px;
-  padding: 3px;
-  margin-bottom: 12px;
-}
-.seg-btn {
-  flex: 1; padding: 7px 4px;
-  border: none; background: transparent;
-  border-radius: 6px;
-  font-size: 12px; font-weight: 600;
-  color: #888; cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
-  line-height: 1.3;
-}
-.seg-btn small { font-size: 10px; font-weight: 400; display: block; color: #AAA; }
-.seg-btn.active { background: white; color: #1A1A1A; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-.seg-btn.active small { color: #666; }
-
-/* Direction */
-.dir-row { display: flex; gap: 8px; margin-bottom: 12px; }
-.dir-btn {
-  flex: 1; padding: 10px;
-  border: 1.5px solid #D8D4CE;
-  background: white; border-radius: 8px;
-  font-size: 14px; font-weight: 700;
-  cursor: pointer; font-family: inherit;
-  color: #888; transition: all 0.15s;
-  -webkit-appearance: none;
-}
-.dir-btn.long.active  { background: #1A1A1A; border-color: #1A1A1A; color: white; }
-.dir-btn.short.active { background: #1A1A1A; border-color: #1A1A1A; color: white; }
-
-/* Mode seg */
-.mode-seg {
-  display: flex; background: #ECEAE6;
-  border-radius: 8px; padding: 3px;
-  margin-bottom: 14px;
-}
-.mode-btn {
-  flex: 1; padding: 7px 6px;
-  border: none; background: transparent;
-  border-radius: 6px; font-size: 12px;
-  font-weight: 600; color: #888;
-  cursor: pointer; font-family: inherit;
-}
-.mode-btn.active { background: white; color: #1A1A1A; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-
-/* Input rows */
-.section-label {
-  font-size: 11px; font-weight: 600;
-  color: #999; letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-
-.row {
-  display: flex; align-items: center;
-  gap: 10px; margin-bottom: 10px;
-}
-.row label { font-size: 13px; color: #555; width: 72px; flex-shrink: 0; }
-.row input {
-  flex: 1; padding: 9px 12px;
-  border: 1px solid #D8D4CE;
-  border-radius: 8px; font-size: 17px;
-  font-weight: 700; color: #1A1A1A;
-  background: white; outline: none;
-  text-align: right; font-family: inherit;
-  -webkit-appearance: none;
-}
-.row input:focus { border-color: #1A1A1A; }
-.row .unit { font-size: 12px; color: #AAA; width: 22px; }
-
-.quick { display: flex; gap: 5px; margin: -4px 0 12px 82px; }
-.qbtn {
-  flex: 1; padding: 6px 2px;
-  border: 1px solid #D8D4CE;
-  border-radius: 6px; font-size: 11px;
-  font-weight: 600; cursor: pointer;
-  background: white; color: #555;
-  font-family: inherit; transition: all 0.1s;
-}
-.qbtn:active { background: #1A1A1A; color: white; border-color: #1A1A1A; }
-
-.divider { height: 1px; background: #E8E5E0; margin: 16px 0; }
-
-/* Results — clean, no color blocks */
-.result-section { margin-bottom: 4px; }
-
-.result-row {
-  display: flex; justify-content: space-between;
-  align-items: baseline; padding: 10px 0;
-  border-bottom: 1px solid #EDEBE7;
-}
-.result-row:last-child { border-bottom: none; }
-
-.rl { font-size: 12px; color: #888; }
-.rv {
-  font-size: 20px; font-weight: 800;
-  letter-spacing: -0.5px; color: #1A1A1A;
-}
-.rv.red   { color: #B83232; }
-.rv.green { color: #1E6B3A; }
-.rv.blue  { color: #2D5A9E; }
-
-.result-detail {
-  font-size: 11px; color: #AAA;
-  text-align: right; margin-top: 2px;
-  line-height: 1.6;
-}
-
-/* Big result cards — minimal */
-.big-card {
-  background: white; border-radius: 10px;
-  padding: 14px 16px; margin-bottom: 8px;
-  border: 1px solid #E8E5E0;
-}
-.big-card .bc-label {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 1.5px; color: #AAA;
-  text-transform: uppercase; margin-bottom: 6px;
-}
-.big-card .bc-val {
-  font-size: 30px; font-weight: 800;
-  letter-spacing: -1px;
-}
-.big-card .bc-sub { font-size: 12px; color: #AAA; margin-top: 4px; line-height: 1.7; }
-
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-
-.badge {
-  display: inline-block; padding: 3px 10px;
-  border-radius: 20px; font-size: 11px;
-  font-weight: 700; margin-top: 8px;
-}
-.badge.ok  { background: #E8F5EC; color: #1E6B3A; border: 1px solid #B8DEC3; }
-.badge.ok2 { background: #FFF8E6; color: #8B6914; border: 1px solid #DECA8A; }
-.badge.bad { background: #FDEEEE; color: #B83232; border: 1px solid #EEC0C0; }
-
-.fee-note {
-  font-size: 11px; color: #BBB;
-  padding: 10px 0; line-height: 1.7;
-  border-top: 1px solid #E8E5E0;
-  margin-top: 4px;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--bg:#F7F5F2;--white:#FFF;--border:#E2DFD9;--border2:#C8C4BC;--text:#1A1A1A;--muted:#888;--light:#ECEAE6;--red:#B83232;--green:#1E6B3A;--blue:#2D5A9E;--gold:#8B6914;}
+body{background:var(--bg);font-family:-apple-system,'Helvetica Neue',sans-serif;color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:80px;}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--white);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);}
+.nav-btn{flex:1;padding:10px 4px 8px;border:none;background:transparent;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.nav-btn .ico{font-size:20px;}
+.nav-btn.active{color:var(--text);}
+.header{padding:16px 16px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:50;}
+.header h1{font-size:16px;font-weight:700;letter-spacing:0.5px;}
+.header p{font-size:10px;color:var(--muted);margin-top:1px;letter-spacing:1px;}
+.page{display:none;padding:14px 14px 0;}
+.page.active{display:block;}
+.seg{display:flex;background:var(--light);border-radius:8px;padding:3px;margin-bottom:12px;}
+.seg-btn{flex:1;padding:7px 4px;border:none;background:transparent;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;transition:all 0.15s;line-height:1.3;text-align:center;}
+.seg-btn small{font-size:10px;font-weight:400;display:block;color:#AAA;}
+.seg-btn.active{background:var(--white);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.12);}
+.seg-btn.active small{color:#666;}
+.dir-row{display:flex;gap:8px;margin-bottom:12px;}
+.dir-btn{flex:1;padding:10px;border:1.5px solid var(--border2);background:var(--white);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--muted);transition:all 0.15s;-webkit-appearance:none;}
+.dir-btn.active{background:var(--text);border-color:var(--text);color:var(--white);}
+.sec-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.row label{font-size:13px;color:#555;width:76px;flex-shrink:0;}
+.row input{flex:1;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;font-size:17px;font-weight:700;color:var(--text);background:var(--white);outline:none;text-align:right;font-family:inherit;-webkit-appearance:none;}
+.row input:focus{border-color:var(--text);}
+.row .unit{font-size:12px;color:#AAA;width:22px;}
+.quick{display:flex;gap:5px;margin:-4px 0 12px 84px;}
+.qbtn{flex:1;padding:6px 2px;border:1px solid var(--border2);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:var(--white);color:#555;font-family:inherit;}
+.qbtn:active{background:var(--text);color:var(--white);border-color:var(--text);}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.card{background:var(--white);border-radius:10px;padding:13px 14px;margin-bottom:8px;border:1px solid var(--border);}
+.card .cl{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.card .cv{font-size:28px;font-weight:800;letter-spacing:-1px;}
+.card .cs{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.7;}
+.cv.red{color:var(--red);}.cv.green{color:var(--green);}.cv.blue{color:var(--blue);}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:8px;}
+.badge.ok{background:#E8F5EC;color:var(--green);border:1px solid #B8DEC3;}
+.badge.ok2{background:#FFF8E6;color:var(--gold);border:1px solid #DECA8A;}
+.badge.bad{background:#FDEEEE;color:var(--red);border:1px solid #EEC0C0;}
+.fee-note{font-size:11px;color:#BBB;padding:10px 0;line-height:1.7;border-top:1px solid var(--border);margin-top:4px;}
+.log-form{background:var(--white);border-radius:10px;padding:14px;border:1px solid var(--border);margin-bottom:12px;}
+.log-form h3{font-size:13px;font-weight:700;margin-bottom:12px;}
+.form-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.form-row label{font-size:12px;color:#555;width:68px;flex-shrink:0;}
+.form-row input,.form-row select{flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;font-size:15px;font-weight:600;color:var(--text);background:var(--white);outline:none;font-family:inherit;-webkit-appearance:none;}
+.form-row select{font-size:13px;}
+.form-row .unit{font-size:12px;color:#AAA;width:22px;}
+.btn-primary{width:100%;padding:12px;background:var(--text);color:var(--white);border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;}
+.btn-primary:active{opacity:0.8;}
+.btn-outline{width:100%;padding:11px;background:transparent;color:var(--text);border:1.5px solid var(--border2);border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;}
+.trade-item{background:var(--white);border-radius:10px;padding:13px 14px;margin-bottom:8px;border:1px solid var(--border);}
+.trade-item.open{border-left:3px solid var(--blue);}
+.trade-item.win{border-left:3px solid var(--green);}
+.trade-item.loss{border-left:3px solid var(--red);}
+.ti-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.ti-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.5px;}
+.ti-tag.open{background:#EEF2FA;color:var(--blue);}
+.ti-tag.win{background:#E8F5EC;color:var(--green);}
+.ti-tag.loss{background:#FDEEEE;color:var(--red);}
+.ti-pnl{font-size:17px;font-weight:800;}
+.ti-pnl.pos{color:var(--green);}.ti-pnl.neg{color:var(--red);}.ti-pnl.zero{color:var(--muted);}
+.ti-detail{font-size:11px;color:var(--muted);line-height:1.8;}
+.ti-actions{display:flex;gap:6px;margin-top:10px;}
+.ti-btn{flex:1;padding:7px;border:1px solid var(--border2);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:#555;font-family:inherit;}
+.ti-btn.close-btn{background:var(--text);color:var(--white);border-color:var(--text);}
+.ti-btn.del-btn{color:var(--red);border-color:#EEC0C0;}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.stat-card{background:var(--white);border-radius:10px;padding:13px 14px;border:1px solid var(--border);}
+.stat-card .sl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.stat-card .sv{font-size:22px;font-weight:800;}
+.stat-card .sv.pos{color:var(--green);}.stat-card .sv.neg{color:var(--red);}
+.chart-wrap{background:var(--white);border-radius:10px;padding:14px;border:1px solid var(--border);margin-bottom:10px;}
+.chart-wrap h3{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.no-data{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:flex-end;}
+.modal{background:var(--white);border-radius:16px 16px 0 0;padding:20px 16px;width:100%;max-width:480px;margin:0 auto;}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:14px;}
+.modal .close-x{float:right;font-size:20px;cursor:pointer;color:var(--muted);background:none;border:none;font-family:inherit;}
 </style>
 </head>
 <body>
-
 <div class="header">
-  <h1>台指期計算機</h1>
+  <h1 id="page-title">台指期計算機</h1>
   <p>TAIWAN FUTURES · POSITION CALCULATOR</p>
 </div>
 
-<div class="body">
-
-  <!-- Contract -->
+<!-- PAGE 1: Calculator -->
+<div class="page active" id="pg-calc">
   <div class="seg">
-    <button class="seg-btn active" onclick="setContract('micro')" id="tab-micro">
-      微型台指<small>每點 $10</small>
-    </button>
-    <button class="seg-btn" onclick="setContract('mini')" id="tab-mini">
-      小台指<small>每點 $50</small>
-    </button>
-    <button class="seg-btn" onclick="setContract('big')" id="tab-big">
-      大台指<small>每點 $200</small>
-    </button>
+    <button class="seg-btn active" onclick="setContract('micro')" id="tab-micro">微型台指<small>每點 $10</small></button>
+    <button class="seg-btn" onclick="setContract('mini')" id="tab-mini">小台指<small>每點 $50</small></button>
+    <button class="seg-btn" onclick="setContract('big')" id="tab-big">大台指<small>每點 $200</small></button>
   </div>
-
-  <!-- Direction -->
   <div class="dir-row">
-    <button class="dir-btn long active" onclick="setDir('long')" id="btn-long">做多 ▲</button>
-    <button class="dir-btn short" onclick="setDir('short')" id="btn-short">做空 ▼</button>
+    <button class="dir-btn active" onclick="setDir('long')" id="btn-long">做多 ▲</button>
+    <button class="dir-btn" onclick="setDir('short')" id="btn-short">做空 ▼</button>
   </div>
-
-  <!-- Mode -->
-  <div class="mode-seg">
-    <button class="mode-btn active" onclick="setMode('sl')" id="mode-sl">先設停損點位</button>
-    <button class="mode-btn" onclick="setMode('pts')" id="mode-pts">先設虧損點數</button>
+  <div class="seg" style="margin-bottom:14px;">
+    <button class="seg-btn active" onclick="setMode('sl')" id="mode-sl">先設停損點位</button>
+    <button class="seg-btn" onclick="setMode('pts')" id="mode-pts">先設虧損點數</button>
   </div>
-
-  <!-- Inputs -->
-  <div class="section-label">設定</div>
-
-  <div class="row">
-    <label>口數</label>
-    <input type="number" id="lots" value="1" min="1" max="20" inputmode="numeric" oninput="calc()">
-    <span class="unit">口</span>
-  </div>
-
+  <div class="sec-label">設定</div>
+  <div class="row"><label>口數</label><input type="number" id="lots" value="1" min="1" max="20" inputmode="numeric" oninput="calc()"><span class="unit">口</span></div>
   <div id="panel-sl">
-    <div class="row">
-      <label>停損點位</label>
-      <input type="number" id="sl-price" value="40000" inputmode="numeric" oninput="calc()">
-      <span class="unit">點</span>
-    </div>
-    <div class="row">
-      <label>進場緩衝</label>
-      <input type="number" id="buffer" value="50" inputmode="numeric" oninput="calc()">
-      <span class="unit">點</span>
-    </div>
+    <div class="row"><label>停損點位</label><input type="number" id="sl-price" value="40000" inputmode="numeric" oninput="calc()"><span class="unit">點</span></div>
+    <div class="row"><label>進場緩衝</label><input type="number" id="buffer" value="50" inputmode="numeric" oninput="calc()"><span class="unit">點</span></div>
     <div class="quick">
       <button class="qbtn" onclick="sv('buffer',20)">20</button>
       <button class="qbtn" onclick="sv('buffer',30)">30</button>
@@ -242,18 +125,9 @@ body {
       <button class="qbtn" onclick="sv('buffer',100)">100</button>
     </div>
   </div>
-
   <div id="panel-pts" style="display:none">
-    <div class="row">
-      <label>進場點位</label>
-      <input type="number" id="entry-px" value="40200" inputmode="numeric" oninput="calc()">
-      <span class="unit">點</span>
-    </div>
-    <div class="row">
-      <label>最多虧損</label>
-      <input type="number" id="loss-pts" value="50" inputmode="numeric" oninput="calc()">
-      <span class="unit">點</span>
-    </div>
+    <div class="row"><label>進場點位</label><input type="number" id="entry-px" value="40200" inputmode="numeric" oninput="calc()"><span class="unit">點</span></div>
+    <div class="row"><label>最多虧損</label><input type="number" id="loss-pts" value="50" inputmode="numeric" oninput="calc()"><span class="unit">點</span></div>
     <div class="quick">
       <button class="qbtn" onclick="sv('loss-pts',30)">30</button>
       <button class="qbtn" onclick="sv('loss-pts',50)">50</button>
@@ -262,137 +136,241 @@ body {
       <button class="qbtn" onclick="sv('loss-pts',150)">150</button>
     </div>
   </div>
-
-  <div class="row">
-    <label>賺賠比</label>
-    <input type="number" id="ratio" value="2" min="0.5" step="0.5" inputmode="decimal" oninput="calc()">
-    <span class="unit">: 1</span>
-  </div>
+  <div class="row"><label>賺賠比</label><input type="number" id="ratio" value="2" min="0.5" step="0.5" inputmode="decimal" oninput="calc()"><span class="unit">: 1</span></div>
   <div class="quick">
     <button class="qbtn" onclick="sv('ratio',1.5)">1.5</button>
     <button class="qbtn" onclick="sv('ratio',2)">2</button>
     <button class="qbtn" onclick="sv('ratio',2.5)">2.5</button>
     <button class="qbtn" onclick="sv('ratio',3)">3</button>
   </div>
-
   <div class="divider"></div>
-
-  <!-- Results -->
   <div id="results"></div>
+</div>
 
+<!-- PAGE 2: Log -->
+<div class="page" id="pg-log">
+  <div class="log-form">
+    <h3>📥 記錄進場</h3>
+    <div class="form-row"><label>商品</label><select id="log-contract"><option value="micro">微型台指</option><option value="mini">小台指</option><option value="big">大台指</option></select></div>
+    <div class="form-row"><label>方向</label><select id="log-dir"><option value="long">做多 ▲</option><option value="short">做空 ▼</option></select></div>
+    <div class="form-row"><label>口數</label><input type="number" id="log-lots" value="1" min="1" inputmode="numeric"><span class="unit">口</span></div>
+    <div class="form-row"><label>進場點位</label><input type="number" id="log-entry" placeholder="e.g. 40200" inputmode="numeric"><span class="unit">點</span></div>
+    <div class="form-row"><label>停損點位</label><input type="number" id="log-sl" placeholder="可空白" inputmode="numeric"><span class="unit">點</span></div>
+    <div class="form-row"><label>停利點位</label><input type="number" id="log-tp" placeholder="可空白" inputmode="numeric"><span class="unit">點</span></div>
+    <div class="form-row"><label>備註</label><input type="text" id="log-note" placeholder="可空白" style="font-size:13px;font-weight:400;"></div>
+    <button class="btn-primary" onclick="addTrade()">＋ 記錄進場</button>
+  </div>
+  <div class="sec-label" style="margin-top:4px;">交易記錄</div>
+  <div id="trade-list"></div>
+</div>
+
+<!-- PAGE 3: Stats -->
+<div class="page" id="pg-stats">
+  <div class="stats-grid" id="stats-grid"></div>
+  <div class="chart-wrap">
+    <h3>損益推移</h3>
+    <canvas id="pnl-chart" height="200"></canvas>
+  </div>
+  <button class="btn-outline" onclick="exportCSV()">📊 匯出交易記錄 CSV</button>
+</div>
+
+<!-- Close Modal -->
+<div class="modal-bg" id="close-modal" style="display:none" onclick="closeModalBg(event)">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h3>記錄出場</h3>
+    <div class="form-row"><label>出場點位</label><input type="number" id="exit-px" placeholder="e.g. 40400" inputmode="numeric"><span class="unit">點</span></div>
+    <div class="form-row"><label>備註</label><input type="text" id="exit-note" placeholder="可空白" style="font-size:13px;font-weight:400;"></div>
+    <button class="btn-primary" onclick="closeTrade()">確認出場</button>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="goPage('calc')" id="nav-calc"><span class="ico">🧮</span>計算機</button>
+  <button class="nav-btn" onclick="goPage('log')" id="nav-log"><span class="ico">📋</span>交易記錄</button>
+  <button class="nav-btn" onclick="goPage('stats')" id="nav-stats"><span class="ico">📈</span>統計</button>
 </div>
 
 <script>
-let contract='micro', direction='long', mode='sl';
+let contract='micro',direction='long',mode='sl';
 const PV={micro:10,mini:50,big:200};
-const FEE={micro:13,mini:17,big:35};
+const FEE={micro:12,mini:17,big:35};
 const NM={micro:'微台',mini:'小台',big:'大台'};
-
-function setContract(c){
-  contract=c;
-  ['micro','mini','big'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===c));
-  calc();
-}
-function setDir(d){
-  direction=d;
-  document.getElementById('btn-long').classList.toggle('active',d==='long');
-  document.getElementById('btn-short').classList.toggle('active',d==='short');
-  calc();
-}
-function setMode(m){
-  mode=m;
-  document.getElementById('mode-sl').classList.toggle('active',m==='sl');
-  document.getElementById('mode-pts').classList.toggle('active',m==='pts');
-  document.getElementById('panel-sl').style.display=m==='sl'?'':'none';
-  document.getElementById('panel-pts').style.display=m==='pts'?'':'none';
-  calc();
-}
-function sv(id,v){document.getElementById(id).value=v;calc();}
+let trades=JSON.parse(localStorage.getItem('fc_trades')||'[]');
+let closingId=null,pnlChart=null;
+function save(){localStorage.setItem('fc_trades',JSON.stringify(trades));}
 function f(n){return Math.round(n).toLocaleString('zh-TW');}
+function today(){return new Date().toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'});}
+
+function goPage(p){
+  ['calc','log','stats'].forEach(x=>{
+    document.getElementById('pg-'+x).classList.toggle('active',x===p);
+    document.getElementById('nav-'+x).classList.toggle('active',x===p);
+  });
+  const titles={calc:'台指期計算機',log:'交易記錄',stats:'統計分析'};
+  document.getElementById('page-title').textContent=titles[p];
+  if(p==='log')renderTrades();
+  if(p==='stats'){renderStats();renderChart();}
+}
+
+function setContract(c){contract=c;['micro','mini','big'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===c));calc();}
+function setDir(d){direction=d;document.getElementById('btn-long').classList.toggle('active',d==='long');document.getElementById('btn-short').classList.toggle('active',d==='short');calc();}
+function setMode(m){mode=m;document.getElementById('mode-sl').classList.toggle('active',m==='sl');document.getElementById('mode-pts').classList.toggle('active',m==='pts');document.getElementById('panel-sl').style.display=m==='sl'?'':'none';document.getElementById('panel-pts').style.display=m==='pts'?'':'none';calc();}
+function sv(id,v){document.getElementById(id).value=v;calc();}
+
+function calcCosts(px,lots,c){
+  const fee=FEE[c]*2*lots;
+  const tax=Math.round(px*PV[c]*lots*0.00002*2);
+  return{fee,tax,total:fee+tax};
+}
 
 function calc(){
   const lots=parseInt(document.getElementById('lots').value)||1;
   const ratio=parseFloat(document.getElementById('ratio').value)||2;
-  const pv=PV[contract], fee=FEE[contract];
-  let entry, sl, lossPts;
-
+  const pv=PV[contract];
+  let entry,sl,lossPts;
   if(mode==='sl'){
     sl=parseFloat(document.getElementById('sl-price').value)||40000;
     const buf=parseFloat(document.getElementById('buffer').value)||50;
     entry=direction==='long'?sl+buf:sl-buf;
     lossPts=buf;
-  } else {
+  }else{
     entry=parseFloat(document.getElementById('entry-px').value)||40200;
     lossPts=parseFloat(document.getElementById('loss-pts').value)||50;
     sl=direction==='long'?entry-lossPts:entry+lossPts;
   }
-
+  const costs=calcCosts(entry,lots,contract);
   const lossAmt=lossPts*pv*lots;
-  const feeTotal=fee*2*lots;
-  const lossNet=lossAmt+feeTotal;
+  const lossNet=lossAmt+costs.total;
   const profitPts=lossPts*ratio;
   const tp=direction==='long'?entry+profitPts:entry-profitPts;
-  const profitNet=profitPts*pv*lots-feeTotal;
+  const profitNet=profitPts*pv*lots-costs.total;
   const realR=(profitNet/lossNet).toFixed(2);
-
   let badge,bc;
   if(ratio>=2.5){badge='✓ 優質賺賠比';bc='ok';}
   else if(ratio>=2){badge='可接受';bc='ok2';}
   else{badge='偏低，謹慎入場';bc='bad';}
-
-  const dLabel=direction==='long'?'多單':'空單';
-
   document.getElementById('results').innerHTML=`
     <div class="two-col">
-      <div class="big-card">
-        <div class="bc-label">最差進場點</div>
-        <div class="bc-val blue">${f(entry)}</div>
-        <div class="bc-sub">${dLabel} · ${NM[contract]} ${lots}口</div>
-      </div>
-      <div class="big-card">
-        <div class="bc-label">停損位置</div>
-        <div class="bc-val red">${f(sl)}</div>
-        <div class="bc-sub">距離 ${lossPts} 點</div>
-      </div>
+      <div class="card"><div class="cl">最差進場點</div><div class="cv blue">${f(entry)}</div><div class="cs">${direction==='long'?'多單':'空單'} · ${NM[contract]} ${lots}口</div></div>
+      <div class="card"><div class="cl">停損位置</div><div class="cv red">${f(sl)}</div><div class="cs">距離 ${lossPts} 點</div></div>
     </div>
-
-    <div class="big-card">
-      <div class="bc-label">最大虧損（含手續費）</div>
-      <div class="bc-val red">－${f(lossNet)} 元</div>
-      <div class="bc-sub">
-        ${lossPts}點 × $${pv} × ${lots}口 = $${f(lossAmt)}<br>
-        手續費來回 $${f(feeTotal)} · 合計 $${f(lossNet)}
-      </div>
+    <div class="card">
+      <div class="cl">最大虧損（含手續費＋期交稅）</div>
+      <div class="cv red">－${f(lossNet)} 元</div>
+      <div class="cs">${lossPts}點 × $${pv} × ${lots}口 = $${f(lossAmt)}<br>手續費來回 $${f(costs.fee)} · 期交稅 $${f(costs.tax)}<br><strong>合計 $${f(lossNet)}</strong></div>
     </div>
-
-    <div class="big-card">
-      <div class="bc-label">停利位置（${ratio}:1）</div>
-      <div class="bc-val green">${f(tp)}</div>
-      <div class="bc-sub">
-        目標 ${profitPts} 點 · 扣費後獲利 $${f(profitNet)}
-      </div>
+    <div class="card">
+      <div class="cl">停利位置（${ratio}:1）</div>
+      <div class="cv green">${f(tp)}</div>
+      <div class="cs">目標 ${profitPts} 點 · 扣費後獲利 <strong>$${f(profitNet)}</strong></div>
     </div>
-
-    <div class="big-card">
-      <div class="bc-label">賺賠比評估</div>
-      <div class="bc-val">${ratio} : 1</div>
-      <div class="bc-sub">實際比（扣費後）= ${realR} : 1</div>
+    <div class="card">
+      <div class="cl">賺賠比評估</div>
+      <div class="cv">${ratio} : 1</div>
+      <div class="cs">實際比（扣費後）= ${realR} : 1</div>
       <span class="badge ${bc}">${badge}</span>
     </div>
+    <div class="fee-note">手續費：微台 $12 · 小台 $17 · 大台 $35（單向）· 期交稅萬分之2（來回計算）</div>`;
+}
 
-    <div class="fee-note">
-      手續費：微台 $13 · 小台 $17 · 大台 $35（單向，含來回計算）
-    </div>
-  `;
+function addTrade(){
+  const c=document.getElementById('log-contract').value;
+  const dir=document.getElementById('log-dir').value;
+  const lots=parseInt(document.getElementById('log-lots').value)||1;
+  const entry=parseFloat(document.getElementById('log-entry').value);
+  if(!entry){alert('請輸入進場點位');return;}
+  const sl=parseFloat(document.getElementById('log-sl').value)||null;
+  const tp=parseFloat(document.getElementById('log-tp').value)||null;
+  const note=document.getElementById('log-note').value.trim();
+  trades.unshift({id:Date.now(),date:today(),contract:c,dir,lots,entry,sl,tp,note,status:'open',exit:null,exitNote:null,pnl:null});
+  save();
+  ['log-entry','log-sl','log-tp','log-note'].forEach(id=>document.getElementById(id).value='');
+  renderTrades();
+}
+
+function renderTrades(){
+  const el=document.getElementById('trade-list');
+  if(!trades.length){el.innerHTML='<div class="no-data">尚無交易記錄</div>';return;}
+  el.innerHTML=trades.map(t=>{
+    const pnlStr=t.pnl!==null?`<span class="ti-pnl ${t.pnl>0?'pos':t.pnl<0?'neg':'zero'}">${t.pnl>0?'+':''}${f(t.pnl)} 元</span>`:`<span class="ti-pnl zero">持倉中</span>`;
+    const tc=t.status==='open'?'open':t.pnl>0?'win':'loss';
+    const tt=t.status==='open'?'持倉中':t.pnl>0?'獲利':'虧損';
+    const cb=t.status==='open'?`<button class="ti-btn close-btn" onclick="openCloseModal(${t.id})">記錄出場</button>`:'';
+    const noteStr=[t.note,t.exitNote].filter(Boolean).join(' / ');
+    return`<div class="trade-item ${tc}">
+      <div class="ti-top"><div><span class="ti-tag ${tc}">${tt}</span><span style="font-size:11px;color:var(--muted);margin-left:6px;">${t.date}</span></div>${pnlStr}</div>
+      <div class="ti-detail">${NM[t.contract]} · ${t.dir==='long'?'多單▲':'空單▼'} · ${t.lots}口<br>進場 ${f(t.entry)}${t.sl?' · 停損 '+f(t.sl):''}${t.tp?' · 停利 '+f(t.tp):''}<br>${t.status!=='open'?'出場 '+f(t.exit)+'<br>':''}${noteStr?'備註：'+noteStr:''}</div>
+      <div class="ti-actions">${cb}<button class="ti-btn del-btn" onclick="deleteTrade(${t.id})">刪除</button></div>
+    </div>`;
+  }).join('');
+}
+
+function openCloseModal(id){closingId=id;document.getElementById('exit-px').value='';document.getElementById('exit-note').value='';document.getElementById('close-modal').style.display='flex';}
+function closeModal(){document.getElementById('close-modal').style.display='none';closingId=null;}
+function closeModalBg(e){if(e.target.id==='close-modal')closeModal();}
+
+function closeTrade(){
+  const exit=parseFloat(document.getElementById('exit-px').value);
+  if(!exit){alert('請輸入出場點位');return;}
+  const note=document.getElementById('exit-note').value.trim();
+  const t=trades.find(x=>x.id===closingId);
+  if(!t)return;
+  const costs=calcCosts(exit,t.lots,t.contract);
+  const raw=t.dir==='long'?(exit-t.entry)*PV[t.contract]*t.lots:(t.entry-exit)*PV[t.contract]*t.lots;
+  t.pnl=Math.round(raw-costs.total);
+  t.exit=exit;t.exitNote=note;t.status='closed';
+  save();closeModal();renderTrades();
+}
+
+function deleteTrade(id){if(!confirm('確定刪除？'))return;trades=trades.filter(x=>x.id!==id);save();renderTrades();}
+
+function renderStats(){
+  const closed=trades.filter(t=>t.status==='closed');
+  const wins=closed.filter(t=>t.pnl>0);
+  const losses=closed.filter(t=>t.pnl<=0);
+  const totalPnl=closed.reduce((s,t)=>s+t.pnl,0);
+  const winRate=closed.length?Math.round(wins.length/closed.length*100):0;
+  const avgWin=wins.length?wins.reduce((s,t)=>s+t.pnl,0)/wins.length:0;
+  const avgLoss=losses.length?Math.abs(losses.reduce((s,t)=>s+t.pnl,0)/losses.length):0;
+  const rr=avgLoss?(avgWin/avgLoss).toFixed(2):'—';
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat-card"><div class="sl">總損益</div><div class="sv ${totalPnl>=0?'pos':'neg'}">${totalPnl>=0?'+':''}${f(totalPnl)}</div></div>
+    <div class="stat-card"><div class="sl">勝率</div><div class="sv">${winRate}%</div></div>
+    <div class="stat-card"><div class="sl">已結算筆數</div><div class="sv">${closed.length}</div></div>
+    <div class="stat-card"><div class="sl">實際賺賠比</div><div class="sv">${rr}</div></div>
+    <div class="stat-card"><div class="sl">平均獲利</div><div class="sv pos">+${f(avgWin)}</div></div>
+    <div class="stat-card"><div class="sl">平均虧損</div><div class="sv neg">-${f(avgLoss)}</div></div>`;
+}
+
+function renderChart(){
+  const closed=[...trades].filter(t=>t.status==='closed').reverse();
+  const ctx=document.getElementById('pnl-chart').getContext('2d');
+  if(pnlChart){pnlChart.destroy();pnlChart=null;}
+  if(!closed.length){ctx.clearRect(0,0,400,200);ctx.fillStyle='#AAA';ctx.font='13px sans-serif';ctx.textAlign='center';ctx.fillText('尚無已結算交易',200,100);return;}
+  let cum=0;
+  const labels=closed.map((_,i)=>`#${i+1}`);
+  const cumData=closed.map(t=>{cum+=t.pnl;return cum;});
+  const barColors=closed.map(t=>t.pnl>0?'rgba(30,107,58,0.7)':'rgba(184,50,50,0.7)');
+  pnlChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[
+    {type:'line',data:cumData,borderColor:'#2D5A9E',borderWidth:2,pointRadius:3,fill:false,tension:0.3,yAxisID:'y'},
+    {type:'bar',data:closed.map(t=>t.pnl),backgroundColor:barColors,yAxisID:'y'}
+  ]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`$${f(c.raw)} 元`}}},scales:{y:{ticks:{callback:v=>`$${f(v)}`},grid:{color:'rgba(0,0,0,0.05)'}},x:{grid:{display:false}}}}});
+}
+
+function exportCSV(){
+  const closed=trades.filter(t=>t.status==='closed');
+  if(!closed.length){alert('尚無已結算交易');return;}
+  const rows=[['日期','商品','方向','口數','進場點','出場點','損益(元)','備註']];
+  closed.forEach(t=>rows.push([t.date,NM[t.contract],t.dir==='long'?'多':'空',t.lots,t.entry,t.exit,t.pnl,[t.note,t.exitNote].filter(Boolean).join(' / ')]));
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`交易記錄_${new Date().toLocaleDateString('zh-TW').replace(/\//g,'-')}.csv`;
+  a.click();
 }
 
 calc();
-
-if('serviceWorker' in navigator){
-  const sw=`const C='fc-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['/']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
-  const blob=new Blob([sw],{type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
-}
 </script>
 </body>
 </html>
