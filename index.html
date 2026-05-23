@@ -31,14 +31,29 @@ body{background:var(--bg);font-family:-apple-system,'Helvetica Neue',sans-serif;
 .dir-btn{flex:1;padding:10px;border:1.5px solid var(--border2);background:var(--white);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--muted);transition:all 0.15s;-webkit-appearance:none;}
 .dir-btn.active{background:var(--text);border-color:var(--text);color:var(--white);}
 .sec-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+
+/* Linked input group */
+.linked-group{background:var(--white);border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:12px;}
+.linked-row{display:flex;align-items:center;padding:0 14px;border-bottom:1px solid var(--border);}
+.linked-row:last-child{border-bottom:none;}
+.linked-row label{font-size:12px;color:var(--muted);width:68px;flex-shrink:0;padding:12px 0;}
+.linked-row input{flex:1;border:none;outline:none;font-size:18px;font-weight:700;color:var(--text);text-align:right;padding:12px 0;background:transparent;font-family:inherit;-webkit-appearance:none;}
+.linked-row input.auto{color:var(--muted);}
+.linked-row .unit{font-size:12px;color:#BBB;margin-left:6px;width:20px;}
+.linked-row .lock{font-size:14px;margin-left:4px;cursor:pointer;opacity:0.4;}
+.linked-row .lock.on{opacity:1;}
+.linked-divider{height:1px;background:var(--border);margin:0;}
+
 .row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
 .row label{font-size:13px;color:#555;width:76px;flex-shrink:0;}
 .row input{flex:1;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;font-size:17px;font-weight:700;color:var(--text);background:var(--white);outline:none;text-align:right;font-family:inherit;-webkit-appearance:none;}
 .row input:focus{border-color:var(--text);}
 .row .unit{font-size:12px;color:#AAA;width:22px;}
-.quick{display:flex;gap:5px;margin:-4px 0 12px 84px;}
+.quick{display:flex;gap:5px;margin:-4px 0 12px 0;}
 .qbtn{flex:1;padding:6px 2px;border:1px solid var(--border2);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:var(--white);color:#555;font-family:inherit;}
 .qbtn:active{background:var(--text);color:var(--white);border-color:var(--text);}
+.qlabel{font-size:10px;color:var(--muted);margin-bottom:4px;letter-spacing:0.5px;}
+
 .divider{height:1px;background:var(--border);margin:14px 0;}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
 .card{background:var(--white);border-radius:10px;padding:13px 14px;margin-bottom:8px;border:1px solid var(--border);}
@@ -89,6 +104,8 @@ body{background:var(--bg);font-family:-apple-system,'Helvetica Neue',sans-serif;
 .modal{background:var(--white);border-radius:16px 16px 0 0;padding:20px 16px;width:100%;max-width:480px;margin:0 auto;}
 .modal h3{font-size:15px;font-weight:700;margin-bottom:14px;}
 .modal .close-x{float:right;font-size:20px;cursor:pointer;color:var(--muted);background:none;border:none;font-family:inherit;}
+/* hint */
+.hint{font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.3px;}
 </style>
 </head>
 <body>
@@ -99,50 +116,68 @@ body{background:var(--bg);font-family:-apple-system,'Helvetica Neue',sans-serif;
 
 <!-- PAGE 1: Calculator -->
 <div class="page active" id="pg-calc">
+  <!-- Contract -->
   <div class="seg">
     <button class="seg-btn active" onclick="setContract('micro')" id="tab-micro">微型台指<small>每點 $10</small></button>
     <button class="seg-btn" onclick="setContract('mini')" id="tab-mini">小台指<small>每點 $50</small></button>
     <button class="seg-btn" onclick="setContract('big')" id="tab-big">大台指<small>每點 $200</small></button>
   </div>
+  <!-- Direction -->
   <div class="dir-row">
     <button class="dir-btn active" onclick="setDir('long')" id="btn-long">做多 ▲</button>
     <button class="dir-btn" onclick="setDir('short')" id="btn-short">做空 ▼</button>
   </div>
-  <div class="seg" style="margin-bottom:14px;">
-    <button class="seg-btn active" onclick="setMode('sl')" id="mode-sl">先設停損點位</button>
-    <button class="seg-btn" onclick="setMode('pts')" id="mode-pts">先設虧損點數</button>
+  <!-- Lots -->
+  <div class="row" style="margin-bottom:12px;">
+    <label style="font-size:13px;color:#555;width:76px;flex-shrink:0;">口數</label>
+    <input type="number" id="lots" value="1" min="1" max="20" inputmode="numeric" oninput="calc()" style="flex:1;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;font-size:17px;font-weight:700;color:var(--text);background:var(--white);outline:none;text-align:right;font-family:inherit;">
+    <span style="font-size:12px;color:#AAA;width:22px;">口</span>
   </div>
-  <div class="sec-label">設定</div>
-  <div class="row"><label>口數</label><input type="number" id="lots" value="1" min="1" max="20" inputmode="numeric" oninput="calc()"><span class="unit">口</span></div>
-  <div id="panel-sl">
-    <div class="row"><label>停損點位</label><input type="number" id="sl-price" value="40000" inputmode="numeric" oninput="calc()"><span class="unit">點</span></div>
-    <div class="row"><label>進場緩衝</label><input type="number" id="buffer" value="50" inputmode="numeric" oninput="calc()"><span class="unit">點</span></div>
-    <div class="quick">
-      <button class="qbtn" onclick="sv('buffer',20)">20</button>
-      <button class="qbtn" onclick="sv('buffer',30)">30</button>
-      <button class="qbtn" onclick="sv('buffer',50)">50</button>
-      <button class="qbtn" onclick="sv('buffer',80)">80</button>
-      <button class="qbtn" onclick="sv('buffer',100)">100</button>
+
+  <!-- Linked 3-field group -->
+  <p class="hint">修改任一欄位，其他自動計算</p>
+  <div class="linked-group">
+    <div class="linked-row">
+      <label>進場點位</label>
+      <input type="number" id="f-entry" inputmode="numeric" placeholder="—" oninput="onField('entry')">
+      <span class="unit">點</span>
+    </div>
+    <div class="linked-row">
+      <label>停損點位</label>
+      <input type="number" id="f-sl" inputmode="numeric" placeholder="—" oninput="onField('sl')">
+      <span class="unit">點</span>
+    </div>
+    <div class="linked-row">
+      <label>虧損點數</label>
+      <input type="number" id="f-pts" inputmode="numeric" placeholder="—" oninput="onField('pts')">
+      <span class="unit">點</span>
     </div>
   </div>
-  <div id="panel-pts" style="display:none">
-    <div class="row"><label>進場點位</label><input type="number" id="entry-px" value="40200" inputmode="numeric" oninput="calc()"><span class="unit">點</span></div>
-    <div class="row"><label>最多虧損</label><input type="number" id="loss-pts" value="50" inputmode="numeric" oninput="calc()"><span class="unit">點</span></div>
-    <div class="quick">
-      <button class="qbtn" onclick="sv('loss-pts',30)">30</button>
-      <button class="qbtn" onclick="sv('loss-pts',50)">50</button>
-      <button class="qbtn" onclick="sv('loss-pts',80)">80</button>
-      <button class="qbtn" onclick="sv('loss-pts',100)">100</button>
-      <button class="qbtn" onclick="sv('loss-pts',150)">150</button>
-    </div>
+
+  <!-- Quick pts -->
+  <div class="qlabel">快速設定虧損點數</div>
+  <div class="quick" style="margin-bottom:14px;">
+    <button class="qbtn" onclick="quickPts(20)">20</button>
+    <button class="qbtn" onclick="quickPts(30)">30</button>
+    <button class="qbtn" onclick="quickPts(50)">50</button>
+    <button class="qbtn" onclick="quickPts(80)">80</button>
+    <button class="qbtn" onclick="quickPts(100)">100</button>
+    <button class="qbtn" onclick="quickPts(150)">150</button>
   </div>
-  <div class="row"><label>賺賠比</label><input type="number" id="ratio" value="2" min="0.5" step="0.5" inputmode="decimal" oninput="calc()"><span class="unit">: 1</span></div>
-  <div class="quick">
+
+  <!-- Ratio -->
+  <div class="row" style="margin-bottom:6px;">
+    <label style="font-size:13px;color:#555;width:76px;flex-shrink:0;">賺賠比</label>
+    <input type="number" id="ratio" value="2" min="0.5" step="0.5" inputmode="decimal" oninput="calc()" style="flex:1;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;font-size:17px;font-weight:700;color:var(--text);background:var(--white);outline:none;text-align:right;font-family:inherit;">
+    <span style="font-size:12px;color:#AAA;width:22px;">: 1</span>
+  </div>
+  <div class="quick" style="margin-bottom:14px;">
     <button class="qbtn" onclick="sv('ratio',1.5)">1.5</button>
     <button class="qbtn" onclick="sv('ratio',2)">2</button>
     <button class="qbtn" onclick="sv('ratio',2.5)">2.5</button>
     <button class="qbtn" onclick="sv('ratio',3)">3</button>
   </div>
+
   <div class="divider"></div>
   <div id="results"></div>
 </div>
@@ -192,15 +227,23 @@ body{background:var(--bg);font-family:-apple-system,'Helvetica Neue',sans-serif;
 </div>
 
 <script>
-let contract='micro',direction='long',mode='sl';
+let contract='micro', direction='long';
 const PV={micro:10,mini:50,big:200};
 const FEE={micro:12,mini:17,big:35};
 const NM={micro:'微台',mini:'小台',big:'大台'};
 let trades=JSON.parse(localStorage.getItem('fc_trades')||'[]');
-let closingId=null,pnlChart=null;
+let closingId=null, pnlChart=null;
+// Track which field was last manually edited (entry / sl / pts)
+let lastEdited='pts';
+
 function save(){localStorage.setItem('fc_trades',JSON.stringify(trades));}
 function f(n){return Math.round(n).toLocaleString('zh-TW');}
 function today(){return new Date().toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'});}
+function getNum(id){return parseFloat(document.getElementById(id).value)||null;}
+function setNum(id,v){
+  const el=document.getElementById(id);
+  el.value=v!==null?Math.round(v):'';
+}
 
 function goPage(p){
   ['calc','log','stats'].forEach(x=>{
@@ -213,10 +256,69 @@ function goPage(p){
   if(p==='stats'){renderStats();renderChart();}
 }
 
-function setContract(c){contract=c;['micro','mini','big'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===c));calc();}
-function setDir(d){direction=d;document.getElementById('btn-long').classList.toggle('active',d==='long');document.getElementById('btn-short').classList.toggle('active',d==='short');calc();}
-function setMode(m){mode=m;document.getElementById('mode-sl').classList.toggle('active',m==='sl');document.getElementById('mode-pts').classList.toggle('active',m==='pts');document.getElementById('panel-sl').style.display=m==='sl'?'':'none';document.getElementById('panel-pts').style.display=m==='pts'?'':'none';calc();}
+function setContract(c){
+  contract=c;
+  ['micro','mini','big'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===c));
+  calc();
+}
+function setDir(d){
+  direction=d;
+  document.getElementById('btn-long').classList.toggle('active',d==='long');
+  document.getElementById('btn-short').classList.toggle('active',d==='short');
+  calc();
+}
 function sv(id,v){document.getElementById(id).value=v;calc();}
+
+// Called when user edits one of the three linked fields
+function onField(field){
+  lastEdited=field;
+  const entry=getNum('f-entry');
+  const sl=getNum('f-sl');
+  const pts=getNum('f-pts');
+
+  if(field==='entry'){
+    // entry changed: if sl exists, compute pts; if pts exists, compute sl
+    if(sl!==null){
+      const p=direction==='long'?entry-sl:sl-entry;
+      setNum('f-pts',Math.abs(p));
+    } else if(pts!==null){
+      const newSl=direction==='long'?entry-pts:entry+pts;
+      setNum('f-sl',newSl);
+    }
+  } else if(field==='sl'){
+    // sl changed: if entry exists compute pts; if pts exists compute entry
+    if(entry!==null){
+      const p=direction==='long'?entry-sl:sl-entry;
+      setNum('f-pts',Math.abs(p));
+    } else if(pts!==null){
+      const newEntry=direction==='long'?sl+pts:sl-pts;
+      setNum('f-entry',newEntry);
+    }
+  } else if(field==='pts'){
+    // pts changed: if entry exists compute sl; if sl exists compute entry
+    if(entry!==null){
+      const newSl=direction==='long'?entry-pts:entry+pts;
+      setNum('f-sl',newSl);
+    } else if(sl!==null){
+      const newEntry=direction==='long'?sl+pts:sl-pts;
+      setNum('f-entry',newEntry);
+    }
+  }
+  calc();
+}
+
+function quickPts(v){
+  setNum('f-pts',v);
+  lastEdited='pts';
+  const entry=getNum('f-entry');
+  const sl=getNum('f-sl');
+  if(entry!==null){
+    setNum('f-sl', direction==='long'?entry-v:entry+v);
+  } else if(sl!==null){
+    setNum('f-entry', direction==='long'?sl+v:sl-v);
+  }
+  calc();
+}
 
 function calcCosts(px,lots,c){
   const fee=FEE[c]*2*lots;
@@ -228,42 +330,49 @@ function calc(){
   const lots=parseInt(document.getElementById('lots').value)||1;
   const ratio=parseFloat(document.getElementById('ratio').value)||2;
   const pv=PV[contract];
-  let entry,sl,lossPts;
-  if(mode==='sl'){
-    sl=parseFloat(document.getElementById('sl-price').value)||40000;
-    const buf=parseFloat(document.getElementById('buffer').value)||50;
-    entry=direction==='long'?sl+buf:sl-buf;
-    lossPts=buf;
-  }else{
-    entry=parseFloat(document.getElementById('entry-px').value)||40200;
-    lossPts=parseFloat(document.getElementById('loss-pts').value)||50;
-    sl=direction==='long'?entry-lossPts:entry+lossPts;
-  }
-  const costs=calcCosts(entry,lots,contract);
-  const lossAmt=lossPts*pv*lots;
+
+  const entry=getNum('f-entry');
+  const sl=getNum('f-sl');
+  const pts=getNum('f-pts');
+
+  // Need at least entry+sl OR entry+pts OR sl+pts to calculate
+  if(entry===null && sl===null){ document.getElementById('results').innerHTML=''; return; }
+  if(entry===null && pts===null){ document.getElementById('results').innerHTML=''; return; }
+
+  let useEntry=entry, useSl=sl, usePts=pts;
+  if(useEntry===null) useEntry=direction==='long'?useSl+usePts:useSl-usePts;
+  if(useSl===null)    useSl=direction==='long'?useEntry-usePts:useEntry+usePts;
+  if(usePts===null)   usePts=Math.abs(useEntry-useSl);
+
+  if(usePts<=0){ document.getElementById('results').innerHTML='<p style="color:var(--red);font-size:13px;padding:10px 0;">⚠️ 停損方向錯誤，請確認多空方向</p>'; return; }
+
+  const costs=calcCosts(useEntry,lots,contract);
+  const lossAmt=usePts*pv*lots;
   const lossNet=lossAmt+costs.total;
-  const profitPts=lossPts*ratio;
-  const tp=direction==='long'?entry+profitPts:entry-profitPts;
+  const profitPts=usePts*ratio;
+  const tp=direction==='long'?useEntry+profitPts:useEntry-profitPts;
   const profitNet=profitPts*pv*lots-costs.total;
   const realR=(profitNet/lossNet).toFixed(2);
+
   let badge,bc;
   if(ratio>=2.5){badge='✓ 優質賺賠比';bc='ok';}
   else if(ratio>=2){badge='可接受';bc='ok2';}
   else{badge='偏低，謹慎入場';bc='bad';}
+
   document.getElementById('results').innerHTML=`
     <div class="two-col">
-      <div class="card"><div class="cl">最差進場點</div><div class="cv blue">${f(entry)}</div><div class="cs">${direction==='long'?'多單':'空單'} · ${NM[contract]} ${lots}口</div></div>
-      <div class="card"><div class="cl">停損位置</div><div class="cv red">${f(sl)}</div><div class="cs">距離 ${lossPts} 點</div></div>
+      <div class="card"><div class="cl">進場點</div><div class="cv blue">${f(useEntry)}</div><div class="cs">${direction==='long'?'多單':'空單'} · ${NM[contract]} ${lots}口</div></div>
+      <div class="card"><div class="cl">停損點</div><div class="cv red">${f(useSl)}</div><div class="cs">距離 ${Math.round(usePts)} 點</div></div>
     </div>
     <div class="card">
       <div class="cl">最大虧損（含手續費＋期交稅）</div>
       <div class="cv red">－${f(lossNet)} 元</div>
-      <div class="cs">${lossPts}點 × $${pv} × ${lots}口 = $${f(lossAmt)}<br>手續費來回 $${f(costs.fee)} · 期交稅 $${f(costs.tax)}<br><strong>合計 $${f(lossNet)}</strong></div>
+      <div class="cs">${Math.round(usePts)}點 × $${pv} × ${lots}口 = $${f(lossAmt)}<br>手續費來回 $${f(costs.fee)} · 期交稅 $${f(costs.tax)}<br><strong>合計 $${f(lossNet)}</strong></div>
     </div>
     <div class="card">
       <div class="cl">停利位置（${ratio}:1）</div>
       <div class="cv green">${f(tp)}</div>
-      <div class="cs">目標 ${profitPts} 點 · 扣費後獲利 <strong>$${f(profitNet)}</strong></div>
+      <div class="cs">目標 ${Math.round(profitPts)} 點 · 扣費後獲利 <strong>$${f(profitNet)}</strong></div>
     </div>
     <div class="card">
       <div class="cl">賺賠比評估</div>
@@ -274,6 +383,7 @@ function calc(){
     <div class="fee-note">手續費：微台 $12 · 小台 $17 · 大台 $35（單向）· 期交稅萬分之2（來回計算）</div>`;
 }
 
+// ── Trade Log ──
 function addTrade(){
   const c=document.getElementById('log-contract').value;
   const dir=document.getElementById('log-dir').value;
@@ -369,8 +479,6 @@ function exportCSV(){
   a.download=`交易記錄_${new Date().toLocaleDateString('zh-TW').replace(/\//g,'-')}.csv`;
   a.click();
 }
-
-calc();
 </script>
 </body>
 </html>
